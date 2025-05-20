@@ -3,7 +3,7 @@ const https = require('https');
 exports.handler = async function(event, context) {
   const url = 'https://ma9r-app.github.io/ip-config/ipconfig.txt';
 
-  return new Promise((resolve, reject) => {
+  return new Promise((resolve) => {
     https.get(url, (res) => {
       let data = '';
 
@@ -12,16 +12,19 @@ exports.handler = async function(event, context) {
       });
 
       res.on('end', () => {
+        const [ip, port] = data.trim().split(':');
+        const formatted = `IP: ${ip}\nPort: ${port}`;
+
         resolve({
           statusCode: 200,
           headers: {
             'Content-Type': 'text/plain',
           },
-          body: data,
+          body: formatted,
         });
       });
 
-    }).on('error', (e) => {
+    }).on('error', () => {
       resolve({
         statusCode: 500,
         body: 'Error fetching data.',
